@@ -1,0 +1,95 @@
+// prisma/schema.prisma
+datasource db {
+    provider = "sqlite"
+    url      = "file:./database.db"
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["omitApi"]
+}
+
+model User {
+    id       String @id @default(uuid())
+    name     String
+    email    String @unique
+    password String
+    role     String @default("USER")
+
+    // Additional metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Event {
+    id          String  @id @default(uuid())
+    name        String
+    description String?
+    startTime   String
+    endTime     String
+
+    // Relationships
+    venues        Venue[]
+    activities    Activity[]
+    registrations Registration[]
+
+    // Additional metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Participant {
+    id          String  @id @default(uuid())
+    name        String
+    email       String  @unique
+    phoneNumber String?
+
+    // Relationships
+    registrations Registration[]
+
+    // Additional metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Venue {
+    id       String @id @default(uuid())
+    name     String
+    address  String
+    capacity Int
+
+    // Relationships
+    events Event[]
+
+    // Additional metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Activity {
+    id          String  @id @default(uuid())
+    name        String
+    description String?
+
+    // Relationships
+    events Event[]
+
+    // Additional metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Registration {
+    id            String   @id @default(uuid())
+    eventId       String
+    participantId String
+    status        String   @default("PENDING") // PENDING, CONFIRMED, CANCELED
+    registeredAt  DateTime @default(now())
+
+    // Relationships
+    event       Event       @relation(fields: [eventId], references: [id])
+    participant Participant @relation(fields: [participantId], references: [id])
+
+    // Ensure unique registration
+    @@unique([eventId, participantId])
+}
