@@ -41,6 +41,25 @@ class VenueController {
       next(error);
     }
   }
+
+  // Get all venues
+  async getAllVenues(req: Request, res: Response, next: NextFunction) {
+    try {
+      const venues = await prisma.venue.findMany({
+        include: {
+          events: true,
+        },
+      });
+
+      res.status(200).json({
+        status: 'okay',
+        message: 'Venues retrieved successfully',
+        data: venues,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new VenueController();

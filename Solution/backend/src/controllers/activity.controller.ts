@@ -41,6 +41,25 @@ class ActivityController {
       next(error);
     }
   }
+
+  // Get all activities
+  async getAllActivities(req: Request, res: Response, next: NextFunction) {
+    try {
+      const activities = await prisma.activity.findMany({
+        include: {
+          events: true,
+        },
+      });
+
+      res.status(200).json({
+        status: 'okay',
+        message: 'Activities retrieved successfully',
+        data: activities,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new ActivityController();
