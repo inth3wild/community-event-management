@@ -17,6 +17,23 @@ async function main() {
     },
   });
 
+  // Create initial venue
+  const venue = await prisma.venue.create({
+    data: {
+      name: 'Main Conference Hall',
+      address: '123 Tech Street',
+      capacity: 5,
+    },
+  });
+
+  // Create initial activity
+  const activity = await prisma.activity.create({
+    data: {
+      name: 'Keynote Speech',
+      description: 'Opening keynote about future tech trends',
+    },
+  });
+
   console.log({ admin });
 }
 

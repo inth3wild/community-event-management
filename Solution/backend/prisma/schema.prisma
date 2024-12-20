@@ -1,4 +1,3 @@
-// prisma/schema.prisma
 datasource db {
     provider = "sqlite"
     url      = "file:./database.db"
@@ -14,7 +13,8 @@ model User {
     name     String
     email    String @unique
     password String
-    role     String @default("USER")
+    phone    String
+    role     String @default("USER") // ADMIN
 
     // Additional metadata
     createdAt DateTime @default(now())

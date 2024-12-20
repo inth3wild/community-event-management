@@ -6,13 +6,17 @@ import { environment } from './config/app.config';
 
 // Import route modules
 import activityRouter from './routes/activity.routes';
+import adminRouter from './routes/admin.routes';
 import authRouter from './routes/auth.routes';
-import eventRouter from './routes/event.routes';
-import participantRouter from './routes/participant.routes';
+import registrationRouter from './routes/registration.routes';
+import userRouter from './routes/user.routes';
 import venueRouter from './routes/venue.routes';
 
 // Import error handling middleware
 import { errorHandler } from './middlewares/error.middleware';
+
+// Import auth middlewares
+import { authenticateToken, requireAdmin } from './middlewares/auth.middleware';
 
 const app = express();
 const PORT = environment.PORT;
@@ -28,14 +32,19 @@ app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
     status: 'okay',
     message: 'Welcome to the Community Event Management API',
-    data: null,
   });
 });
-app.use('/api/events', eventRouter);
-app.use('/api/participants', participantRouter);
-app.use('/api/venues', venueRouter);
-app.use('/api/activities', activityRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/user/events', authenticateToken, userRouter);
+app.use('/api/venues', authenticateToken, requireAdmin, venueRouter);
+app.use('/api/activities', authenticateToken, requireAdmin, activityRouter);
+app.use('/api/admin/events', authenticateToken, requireAdmin, adminRouter);
+app.use(
+  '/api/admin/registration',
+  authenticateToken,
+  requireAdmin,
+  registrationRouter
+);
 
 // Global error handler
 app.use(errorHandler);
