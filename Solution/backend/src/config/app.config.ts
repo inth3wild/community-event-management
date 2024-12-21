@@ -6,10 +6,11 @@ dotenv.config();
 export const environment = {
   JWT_SECRET: process.env.JWT_SECRET,
   PORT: process.env.PORT || '3000',
+  CLOUDINARY_URL: process.env.CLOUDINARY_URL,
 };
 
 // Ensure all required enviironment variables are set
-const requiredEnvironmentVariables = ['JWT_SECRET'];
+const requiredEnvironmentVariables = ['JWT_SECRET', 'CLOUDINARY_URL'];
 
 requiredEnvironmentVariables.forEach((variable) => {
   if (

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../config/database.config';
 import { AppError } from '../middlewares/error.middleware';
+import { deleteEventImage, uploadEventImage } from '../utils/cloudinary.utils';
 import {
   createEventSchema,
   updateEventSchema,
@@ -9,9 +10,30 @@ import {
 class AdminEventsController {
   // Create a new event
   async createEvent(req: Request, res: Response, next: NextFunction) {
+    let uploadedImage: any = null;
+
     try {
+      // Parse and preprocess form fields
+      const {
+        venueIds: venuesStringArray,
+        activityIds: activitiesStringArray,
+        startTime,
+        endTime,
+        name,
+        description,
+      } = req.body;
+
+      const normalizedData = {
+        name,
+        description,
+        startTime,
+        endTime,
+        venueIds: JSON.parse(venuesStringArray), // Convert string to array
+        activityIds: JSON.parse(activitiesStringArray), // Convert string to array
+      };
+
       // Validate input
-      const validatedData = createEventSchema.parse(req.body);
+      const validatedData = createEventSchema.parse(normalizedData);
 
       // Check if end time is after start time
       if (
@@ -23,34 +45,33 @@ class AdminEventsController {
       // Destructure the IDs arrays from other event data
       const { venueIds, activityIds, ...eventData } = validatedData;
 
-      // First, verify that all venues exist
+      // Verify venues exist
       const venues = await prisma.venue.findMany({
-        where: {
-          id: {
-            in: venueIds,
-          },
-        },
+        where: { id: { in: venueIds } },
       });
       if (venues.length !== venueIds.length) {
         throw new AppError('One or more venue IDs are invalid', 400);
       }
 
-      // Then verify that all activities exist
+      // Verify activities exist
       const activities = await prisma.activity.findMany({
-        where: {
-          id: {
-            in: activityIds,
-          },
-        },
+        where: { id: { in: activityIds } },
       });
       if (activities.length !== activityIds.length) {
         throw new AppError('One or more activity IDs are invalid', 400);
+      }
+
+      // Handle image upload if present
+      if (req.file) {
+        uploadedImage = await uploadEventImage(req.file);
       }
 
       // Create event in database
       const event = await prisma.event.create({
         data: {
           ...eventData,
+          imageUrl: uploadedImage?.secure_url || null,
+          imageId: uploadedImage?.public_id || null,
           venues: {
             connect: venueIds.map((id) => ({ id })),
           },
@@ -70,6 +91,10 @@ class AdminEventsController {
         data: event,
       });
     } catch (error) {
+      // If upload succeeded but database operation failed, cleanup the uploaded image
+      if (uploadedImage?.public_id) {
+        await deleteEventImage(uploadedImage.public_id);
+      }
       next(error);
     }
   }

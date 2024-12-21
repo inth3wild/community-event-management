@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import adminEventsController from '../controllers/admin-events.controller';
+import { eventImageUpload } from '../middlewares/multer.middleware';
 
 const adminRouter = Router();
 
@@ -13,7 +14,11 @@ adminRouter.get('/participants', adminEventsController.getAllParticipants);
 adminRouter.get('/:eventId', adminEventsController.getEvent);
 
 // Create event route
-adminRouter.post('/create', adminEventsController.createEvent);
+adminRouter.post(
+  '/create',
+  eventImageUpload,
+  adminEventsController.createEvent
+);
 
 // Update event route
 adminRouter.patch('/update/:eventId', adminEventsController.updateEvent);

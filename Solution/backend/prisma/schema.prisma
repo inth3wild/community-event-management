@@ -27,6 +27,8 @@ model Event {
     description String?
     startTime   String
     endTime     String
+    imageUrl    String?
+    imageId     String?
 
     // Relationships
     venues        Venue[]
