@@ -9,41 +9,79 @@ class UserEventsController {
     try {
       const validated = registrationSchema.parse(req.body);
 
-      // Check if event exists and is not full
-      const event = await prisma.event.findUnique({
-        where: { id: validated.eventId },
-        include: {
-          venues: true,
-          registrations: true,
-        },
-      });
+      // Start a transaction to ensure data consistency
+      const registration = await prisma.$transaction(async (tx) => {
+        // Check if event exists and is not full
+        const event = await tx.event.findUnique({
+          where: { id: validated.eventId },
+          include: {
+            venues: true,
+            registrations: true,
+          },
+        });
 
-      if (!event) {
-        throw new AppError('Event not found', 404);
-      }
+        if (!event) {
+          throw new AppError('Event not found', 404);
+        }
 
-      // Check venue capacity
-      const totalRegistrations = event.registrations.length;
-      const totalCapacity = event.venues.reduce(
-        (sum, venue) => sum + venue.capacity,
-        0
-      );
+        // Check venue capacity
+        const totalRegistrations = event.registrations.length;
+        const totalCapacity = event.venues.reduce(
+          (sum, venue) => sum + venue.capacity,
+          0
+        );
 
-      if (totalRegistrations >= totalCapacity) {
-        throw new AppError('Event is full', 400);
-      }
+        if (totalRegistrations >= totalCapacity) {
+          throw new AppError('Event is full', 400);
+        }
 
-      // Create registration
-      const registration = await prisma.registration.create({
-        data: {
-          eventId: validated.eventId,
-          participantId: validated.participantId,
-          status: 'PENDING',
-        },
-        include: {
-          event: true,
-          participant: true,
-        },
+        // Find or create participant
+        let participant = await tx.participant.findUnique({
+          where: { email: validated.participant.email },
+        });
+
+        if (!participant) {
+          // Create new participant
+          participant = await tx.participant.create({
+            data: {
+              email: validated.participant.email,
+              name: validated.participant.name,
+              phoneNumber: validated.participant.phoneNumber,
+            },
+          });
+        }
+
+        // Check if participant is already registered for this event
+        const existingRegistration = await tx.registration.findUnique({
+          where: {
+            eventId_participantId: {
+              eventId: validated.eventId,
+              participantId: participant.id,
+            },
+          },
+        });
+
+        if (existingRegistration) {
+          throw new AppError(
+            'Participant is already registered for this event',
+            400
+          );
+        }
+
+        // Create registration
+        const newRegistration = await tx.registration.create({
+          data: {
+            eventId: validated.eventId,
+            participantId: participant.id,
+            status: 'PENDING',
+          },
+          include: {
+            event: true,
+            participant: true,
+          },
+        });
+
+        return newRegistration;
       });
 
       res.status(201).json({
@@ -129,7 +167,11 @@ class UserEventsController {
           registrations: {
             select: {
               status: true,
-              _count: true,
+            },
+          },
+          _count: {
+            select: {
+              registrations: true,
             },
           },
         },
@@ -170,13 +212,17 @@ class UserEventsController {
           (sum, venue) => sum + venue.capacity,
           0
         );
-        const totalRegistrations = event.registrations.length;
+        const totalRegistrations = event._count.registrations;
         const remainingCapacity = totalCapacity - totalRegistrations;
 
+        // Remove _count from the final response
+        const { _count, ...eventWithoutCount } = event;
+
         return {
-          ...event,
+          ...eventWithoutCount,
           totalCapacity,
           remainingCapacity,
+          totalRegistrations,
         };
       });
 

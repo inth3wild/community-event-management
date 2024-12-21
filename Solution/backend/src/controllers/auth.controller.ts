@@ -27,6 +27,7 @@ class AuthController {
         data: {
           name: validated.name,
           email: validated.email,
+          phoneNumber: validated.phoneNumber,
           password: hashedPassword,
         },
         omit: {

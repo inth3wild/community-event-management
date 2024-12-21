@@ -24,7 +24,11 @@ export const updateRegistrationStatusSchema = z.enum([
 // Validation schema for event registeration
 export const registrationSchema = z.object({
   eventId: z.string().uuid(),
-  participantId: z.string().uuid(),
+  participant: z.object({
+    email: z.string().email('Invalid email format'),
+    name: z.string().min(1, 'Name is required'),
+    phoneNumber: z.string().optional(),
+  }),
 });
 
 // Validation  schema for event updates

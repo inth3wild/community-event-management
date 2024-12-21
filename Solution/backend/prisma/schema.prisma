@@ -9,12 +9,12 @@ generator client {
 }
 
 model User {
-    id       String @id @default(uuid())
-    name     String
-    email    String @unique
-    password String
-    phone    String
-    role     String @default("USER") // ADMIN
+    id          String @id @default(uuid())
+    name        String
+    email       String @unique
+    password    String
+    phoneNumber String
+    role        String @default("USER") // ADMIN
 
     // Additional metadata
     createdAt DateTime @default(now())

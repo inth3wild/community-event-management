@@ -12,7 +12,7 @@ async function main() {
     create: {
       name: 'Admin',
       email: 'admin@example.com',
-      phone: '000000',
+      phoneNumber: '000000',
       password: adminPassword,
       role: 'ADMIN',
     },
