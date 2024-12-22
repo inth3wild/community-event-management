@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Event, Venue, Activity } from '@/types';
 import { useEventStore } from '@/stores/event.store';
@@ -53,21 +52,34 @@ export const EventForm = ({ event, onSuccess }: EventFormProps) => {
     e.preventDefault();
 
     try {
-      // Create FormData to handle file upload
+      // Create FormData instance
       const formDataToSend = new FormData();
 
-      // Append all form fields
-      Object.entries(formData).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach((item) => formDataToSend.append(key, item));
-        } else {
-          formDataToSend.append(key, value);
-        }
-      });
+      // Prepare the arrays as JSON strings
+      const venueIds = Array.isArray(formData.venueIds)
+        ? formData.venueIds
+        : [formData.venueIds];
+      const activityIds = Array.isArray(formData.activityIds)
+        ? formData.activityIds
+        : [formData.activityIds];
 
-      // Append image file if exists
+      // Convert datetime strings to ISO format
+      const startTimeISO = new Date(formData.startTime).toISOString();
+      const endTimeISO = new Date(formData.endTime).toISOString();
+
+      // Append basic fields
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description || '');
+      formDataToSend.append('startTime', startTimeISO);
+      formDataToSend.append('endTime', endTimeISO);
+
+      // Append arrays as JSON strings
+      formDataToSend.append('venueIds', JSON.stringify(venueIds));
+      formDataToSend.append('activityIds', JSON.stringify(activityIds));
+
+      // Append image if exists
       if (imageFile) {
-        formDataToSend.append('image', imageFile);
+        formDataToSend.append('eventImage', imageFile);
       }
 
       if (event) {
@@ -85,21 +97,13 @@ export const EventForm = ({ event, onSuccess }: EventFormProps) => {
         toast({ title: 'Success', description: 'Event updated successfully' });
       } else {
         // Create new event
-        const response = await api.post(
-          '/admin/events/create',
-          formDataToSend,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-        await createEvent(response.data);
+        await createEvent(formDataToSend);
         toast({ title: 'Success', description: 'Event created successfully' });
       }
 
       onSuccess();
     } catch (error) {
+      console.error('Form submission error:', error);
       toast({
         title: 'Error',
         description: 'Failed to save event',
@@ -119,7 +123,6 @@ export const EventForm = ({ event, onSuccess }: EventFormProps) => {
         />
       </div>
 
-      {/* Rest of the form fields remain the same */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Name</label>
         <Input

@@ -11,7 +11,7 @@ interface EventState {
   fetchEvents: (userRole: string) => Promise<void>;
   fetchVenues: () => Promise<void>;
   fetchActivities: () => Promise<void>;
-  createEvent: (eventData: Partial<Event>) => Promise<void>;
+  createEvent: (formData: FormData) => Promise<void>;
   updateEvent: (id: string, eventData: Partial<Event>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
 }
@@ -65,8 +65,12 @@ export const useEventStore = create<EventState>((set, get) => ({
     }
   },
 
-  createEvent: async (eventData) => {
-    const response = await api.post('/admin/events/create', eventData);
+  createEvent: async (formDataToSend) => {
+    const response = await api.post('/admin/events/create', formDataToSend, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     set({ events: [...get().events, response.data] });
   },
 
