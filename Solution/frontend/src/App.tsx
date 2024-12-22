@@ -17,9 +17,6 @@ const PrivateRoute = ({
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
 
-  console.log('PrivateRoute - User:', user); // Debug log
-  console.log('PrivateRoute - Token:', token); // Debug log
-
   if (!token) return <Navigate to="/login" />;
   if (requireAdmin && user?.role !== 'ADMIN') return <Navigate to="/" />;
 

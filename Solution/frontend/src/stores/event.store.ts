@@ -1,12 +1,16 @@
 import api from '@/lib/axios';
-import { Event } from '@/types';
+import { Activity, Event, Venue } from '@/types';
 import { create } from 'zustand';
 
 interface EventState {
   events: Event[];
+  venues: Venue[];
+  activities: Activity[];
   loading: boolean;
   error: string | null;
-  fetchEvents: () => Promise<void>;
+  fetchEvents: (userRole: string) => Promise<void>;
+  fetchVenues: () => Promise<void>;
+  fetchActivities: () => Promise<void>;
   createEvent: (eventData: Partial<Event>) => Promise<void>;
   updateEvent: (id: string, eventData: Partial<Event>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
@@ -14,17 +18,48 @@ interface EventState {
 
 export const useEventStore = create<EventState>((set, get) => ({
   events: [],
+  venues: [],
+  activities: [],
   loading: false,
   error: null,
 
-  fetchEvents: async () => {
+  fetchEvents: async (userRole) => {
     set({ loading: true });
+
     try {
-      const response = await api.get('/admin/events');
+      const response = await api.get(`/${userRole.toLowerCase()}/events`);
       set({ events: response.data, error: null });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       set({ error: 'Failed to fetch events' });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  fetchVenues: async () => {
+    set({ loading: true });
+
+    try {
+      const response = await api.get(`/venues`);
+      set({ venues: response.data, error: null });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      set({ error: 'Failed to fetch venues' });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  fetchActivities: async () => {
+    set({ loading: true });
+
+    try {
+      const response = await api.get(`/activities`);
+      set({ activities: response.data, error: null });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      set({ error: 'Failed to fetch activities' });
     } finally {
       set({ loading: false });
     }

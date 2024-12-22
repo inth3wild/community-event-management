@@ -12,14 +12,24 @@ import {
 import { useAuthStore } from '@/stores/auth.store';
 
 export const EventList = () => {
-  const { events, fetchEvents } = useEventStore();
+  const {
+    events,
+    venues,
+    activities,
+    fetchEvents,
+    fetchVenues,
+    fetchActivities,
+  } = useEventStore();
   const user = useAuthStore((state) => state.user);
   const [search, setSearch] = useState('');
   const [venueFilter, setVenueFilter] = useState('');
   const [activityFilter, setActivityFilter] = useState('');
 
   useEffect(() => {
-    fetchEvents();
+    fetchEvents(user?.role as string);
+    fetchVenues();
+    fetchActivities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchEvents]);
 
   const filteredEvents = events.filter((event) => {
@@ -36,12 +46,6 @@ export const EventList = () => {
     return matchesSearch && matchesVenue && matchesActivity;
   });
 
-  // Get unique venues and activities for filters
-  const venues = Array.from(new Set(events.flatMap((event) => event.venues)));
-  const activities = Array.from(
-    new Set(events.flatMap((event) => event.activities))
-  );
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -55,7 +59,6 @@ export const EventList = () => {
             <SelectValue placeholder="Filter by venue" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All venues</SelectItem>
             {venues.map((venue) => (
               <SelectItem key={venue.id} value={venue.id}>
                 {venue.name}
@@ -63,12 +66,12 @@ export const EventList = () => {
             ))}
           </SelectContent>
         </Select>
+
         <Select value={activityFilter} onValueChange={setActivityFilter}>
           <SelectTrigger>
             <SelectValue placeholder="Filter by activity" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All activities</SelectItem>
             {activities.map((activity) => (
               <SelectItem key={activity.id} value={activity.id}>
                 {activity.name}

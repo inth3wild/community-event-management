@@ -36,8 +36,8 @@ app.get('/', (req: Request, res: Response) => {
 });
 app.use('/api/auth', authRouter);
 app.use('/api/user/events', authenticateToken, userRouter);
-app.use('/api/venues', authenticateToken, requireAdmin, venueRouter);
-app.use('/api/activities', authenticateToken, requireAdmin, activityRouter);
+app.use('/api/venues', authenticateToken, venueRouter);
+app.use('/api/activities', authenticateToken, activityRouter);
 app.use('/api/admin/events', authenticateToken, requireAdmin, adminRouter);
 app.use(
   '/api/admin/registration',
