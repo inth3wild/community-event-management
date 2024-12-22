@@ -5,8 +5,15 @@ import { EventsPage } from '@/pages/events-page';
 import { AdminDashboardPage } from '@/pages/admin-dashboard-page';
 import { RegistrationList } from '@/components/user/registration-list';
 import { Toaster } from '@/components/ui/toaster';
+import { ReactNode } from 'react';
 
-const PrivateRoute = ({ children, requireAdmin = false }) => {
+const PrivateRoute = ({
+  children,
+  requireAdmin = false,
+}: {
+  children: ReactNode;
+  requireAdmin?: boolean;
+}) => {
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
 

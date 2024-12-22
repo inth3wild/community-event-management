@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { AxiosError } from 'axios';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -43,11 +44,14 @@ export const LoginForm = () => {
       }
     } catch (error) {
       console.error('Login error:', error); // Debug log
-      toast({
-        title: 'Error',
-        description: 'Invalid credentials',
-        variant: 'destructive',
-      });
+      if (error instanceof AxiosError) {
+        toast({
+          title: 'Error',
+          description: error.response?.data.message,
+          variant: 'destructive',
+        });
+        return;
+      }
     } finally {
       setIsLoading(false);
     }

@@ -18,8 +18,8 @@ export const useAuthStore = create<AuthState>()(
       token: null,
 
       login: async (email: string, password: string) => {
-        // try {
         const response = await api.post('/auth/login', { email, password });
+        console.log('>>', response);
         const { token, user } = response.data;
 
         // Set token in axios default headers
@@ -30,10 +30,6 @@ export const useAuthStore = create<AuthState>()(
 
         // Store token in localStorage
         localStorage.setItem('token', token);
-        // }
-        // catch (error) {
-        // throw error;
-        // }
       },
 
       logout: () => {

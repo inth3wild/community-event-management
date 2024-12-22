@@ -7,6 +7,7 @@ const api = axios.create({
   },
 });
 
+// Add Authorization header to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -14,5 +15,15 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Return API data from responses
+api.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default api;
