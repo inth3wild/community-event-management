@@ -40,7 +40,7 @@ app.use('/api/venues', authenticateToken, venueRouter);
 app.use('/api/activities', authenticateToken, activityRouter);
 app.use('/api/admin/events', authenticateToken, requireAdmin, adminRouter);
 app.use(
-  '/api/admin/registration',
+  '/api/admin/registrations',
   authenticateToken,
   requireAdmin,
   registrationRouter

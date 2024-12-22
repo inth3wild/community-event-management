@@ -31,7 +31,7 @@ export const RegistrationManagement = () => {
 
   const fetchRegistrations = async () => {
     try {
-      const response = await api.get('/admin/registration');
+      const response = await api.get('/admin/registrations');
       setRegistrations(response.data);
     } catch (error) {
       toast({
@@ -44,7 +44,7 @@ export const RegistrationManagement = () => {
 
   const updateStatus = async (registrationId: string, status: string) => {
     try {
-      await api.put(`/admin/registration/${registrationId}`, { status });
+      await api.put(`/admin/registrations/${registrationId}`, { status });
       toast({ title: 'Success', description: 'Registration status updated' });
       fetchRegistrations();
     } catch (error) {

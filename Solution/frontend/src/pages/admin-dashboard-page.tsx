@@ -17,15 +17,19 @@ export const AdminDashboardPage = () => {
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="registrations">Registrations</TabsTrigger>
           </TabsList>
+
           <TabsContent value="events">
             <EventForm onSuccess={() => {}} />
           </TabsContent>
+
           <TabsContent value="venues">
             <VenueManagement />
           </TabsContent>
+
           <TabsContent value="activities">
             <ActivityManagement />
           </TabsContent>
+
           <TabsContent value="registrations">
             <RegistrationManagement />
           </TabsContent>

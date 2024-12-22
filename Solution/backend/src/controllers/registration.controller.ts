@@ -34,6 +34,26 @@ class RegistrationController {
       next(error);
     }
   }
+
+  // Get all registrations
+  async getAllRegistrations(req: Request, res: Response, next: NextFunction) {
+    try {
+      const registrations = await prisma.registration.findMany({
+        include: {
+          event: true,
+          participant: true,
+        },
+      });
+
+      res.status(200).json({
+        status: 'okay',
+        message: 'Registrations retrieved successfully',
+        data: registrations,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new RegistrationController();
