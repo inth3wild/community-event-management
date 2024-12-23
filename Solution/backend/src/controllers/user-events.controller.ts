@@ -95,12 +95,64 @@ class UserEventsController {
   }
 
   // Get user's registrations
+  // async viewRegistrations(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const participantId = req.params.participantId;
+
+  //     const registrations = await prisma.registration.findMany({
+  //       where: { participantId },
+  //       include: {
+  //         event: {
+  //           include: {
+  //             venues: true,
+  //             activities: true,
+  //           },
+  //         },
+  //         participant: true,
+  //       },
+  //       orderBy: {
+  //         registeredAt: 'desc',
+  //       },
+  //     });
+
+  //     res.status(200).json({
+  //       status: 'okay',
+  //       message: 'Registrations retrieved successfully',
+  //       data: registrations,
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
   async viewRegistrations(req: Request, res: Response, next: NextFunction) {
     try {
-      const participantId = req.params.participantId;
+      const { email } = req.body;
 
+      if (!email) {
+        res.status(400).json({
+          status: 'error',
+          message: 'Email is required',
+        });
+        return;
+      }
+
+      // First find the participant by email
+      const participant = await prisma.participant.findUnique({
+        where: { email },
+      });
+
+      if (!participant) {
+        res.status(200).json({
+          status: 'okay',
+          message: 'No registrations found',
+          data: [],
+        });
+        return;
+      }
+
+      // Then find all registrations for this participant
       const registrations = await prisma.registration.findMany({
-        where: { participantId },
+        where: { participantId: participant.id },
         include: {
           event: {
             include: {

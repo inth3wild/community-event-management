@@ -11,8 +11,8 @@ userRouter.get('/', adminEventsController.getAllEvents);
 userRouter.post('/register', userEventsController.register);
 
 // View user's registrations route
-userRouter.get(
-  '/registrations/:participantId',
+userRouter.post(
+  '/registrations/',
   userEventsController.viewRegistrations
 );
 

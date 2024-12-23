@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useEventStore } from '@/stores/event.store';
 import { EventCard } from './event-card';
@@ -10,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuthStore } from '@/stores/auth.store';
+import { toast } from '@/hooks/use-toast';
 
 export const EventList = () => {
   const {
@@ -19,7 +21,11 @@ export const EventList = () => {
     fetchEvents,
     fetchVenues,
     fetchActivities,
+    registerForEvent,
+    registeredEvents,
+    fetchRegisteredEvents
   } = useEventStore();
+  console.log(registeredEvents);
   const user = useAuthStore((state) => state.user);
   const [search, setSearch] = useState('');
   const [venueFilter, setVenueFilter] = useState('');
@@ -29,8 +35,10 @@ export const EventList = () => {
     fetchEvents(user?.role as string);
     fetchVenues();
     fetchActivities();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchEvents]);
+    if (user && user.role === 'USER') {
+      fetchRegisteredEvents();
+    }
+  }, [fetchEvents, fetchVenues, fetchActivities, fetchRegisteredEvents, user]);
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch = event.name
@@ -45,6 +53,32 @@ export const EventList = () => {
 
     return matchesSearch && matchesVenue && matchesActivity;
   });
+
+  const handleRegister = async (eventId: string) => {
+    try {
+      if (!user) {
+        // Handle not logged in - you might want to show a login dialog or redirect
+        return;
+      }
+
+      await registerForEvent(eventId, {
+        email: user.email,
+        name: user.name,
+        phoneNumber: user.phoneNumber
+      });
+
+      toast({
+        title: "Success!",
+        description: "You have successfully registered for this event.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to register for the event. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -87,9 +121,8 @@ export const EventList = () => {
             key={event.id}
             event={event}
             isAdmin={user?.role === 'ADMIN'}
-            onRegister={() => {
-              // Handle registration
-            }}
+            isRegistered={registeredEvents.includes(event.id)}
+            onRegister={handleRegister}
             onEdit={() => {
               // Handle edit
             }}

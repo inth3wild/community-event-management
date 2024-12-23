@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { Registration } from '@/types';
+import { useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -9,23 +8,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { useAuthStore } from '@/stores/auth.store';
-import api from '@/lib/axios';
+import { useEventStore } from '@/stores/event.store';
 import { format } from 'date-fns';
 
 export const RegistrationList = () => {
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const user = useAuthStore((state) => state.user);
+  const { fetchRegisteredEvents, registrations } = useEventStore();
 
   useEffect(() => {
-    const fetchUserRegistrations = async () => {
-      if (user) {
-        const response = await api.get(`/user/events/registrations/${user.id}`);
-        setRegistrations(response.data);
-      }
-    };
-    fetchUserRegistrations();
-  }, [user]);
+    fetchRegisteredEvents();
+  }, [fetchRegisteredEvents]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

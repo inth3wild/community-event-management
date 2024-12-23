@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import api from '@/lib/axios';
-import { Activity, Event, Venue } from '@/types';
+import { Activity, Event, Registration, Venue } from '@/types';
 import { create } from 'zustand';
+import { useAuthStore } from './auth.store';
 
 interface EventState {
   events: Event[];
@@ -14,6 +17,17 @@ interface EventState {
   createEvent: (formDataToSend: FormData) => Promise<void>;
   updateEvent: (id: string, formDataToSend: FormData) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
+  registeredEvents: string[]; // Array of event IDs the user is registered for
+  registerForEvent: (
+    eventId: string,
+    participantData: {
+      email: string;
+      name: string;
+      phoneNumber?: string;
+    }
+  ) => Promise<void>;
+  fetchRegisteredEvents: () => Promise<void>;
+  registrations: Registration[];
 }
 
 export const useEventStore = create<EventState>((set, get) => ({
@@ -22,6 +36,8 @@ export const useEventStore = create<EventState>((set, get) => ({
   activities: [],
   loading: false,
   error: null,
+  registeredEvents: [],
+  registrations: [],
 
   fetchEvents: async (userRole) => {
     set({ loading: true });
@@ -29,7 +45,6 @@ export const useEventStore = create<EventState>((set, get) => ({
     try {
       const response = await api.get(`/${userRole.toLowerCase()}/events`);
       set({ events: response.data, error: null });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       set({ error: 'Failed to fetch events' });
     } finally {
@@ -43,7 +58,6 @@ export const useEventStore = create<EventState>((set, get) => ({
     try {
       const response = await api.get(`/venues`);
       set({ venues: response.data, error: null });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       set({ error: 'Failed to fetch venues' });
     } finally {
@@ -57,7 +71,6 @@ export const useEventStore = create<EventState>((set, get) => ({
     try {
       const response = await api.get(`/activities`);
       set({ activities: response.data, error: null });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       set({ error: 'Failed to fetch activities' });
     } finally {
@@ -94,5 +107,50 @@ export const useEventStore = create<EventState>((set, get) => ({
   deleteEvent: async (id) => {
     await api.delete(`/admin/events/delete/${id}`);
     set({ events: get().events.filter((event) => event.id !== id) });
+  },
+
+  registerForEvent: async (eventId, participantData) => {
+    set({ loading: true });
+    try {
+      await api.post('/user/events/register', {
+        eventId,
+        participant: participantData,
+      });
+
+      // Add to registered events
+      set({
+        registeredEvents: [...get().registeredEvents, eventId],
+        error: null,
+      });
+    } catch (error) {
+      set({ error: 'Failed to register for event' });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  fetchRegisteredEvents: async () => {
+    set({ loading: true });
+    try {
+      const user = useAuthStore.getState().user;
+      if (!user?.email) {
+        throw new Error('User email not found');
+      }
+
+      const response = await api.post('/user/events/registrations', {
+        email: user.email,
+      });
+
+      set({
+        registeredEvents: response.data.map((reg: any) => reg.event.id),
+        error: null,
+        registrations: [...get().registrations, ...response.data],
+      });
+    } catch (error) {
+      set({ error: 'Failed to fetch registered events' });
+    } finally {
+      set({ loading: false });
+    }
   },
 }));

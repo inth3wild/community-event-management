@@ -11,18 +11,20 @@ import { format } from 'date-fns';
 
 interface EventCardProps {
   event: Event;
-  onRegister?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
   isAdmin?: boolean;
+  onRegister: (eventId: string) => void;
+  isRegistered: boolean;
 }
 
 export const EventCard = ({
   event,
-  onRegister,
   onEdit,
   onDelete,
   isAdmin,
+  onRegister,
+  isRegistered,
 }: EventCardProps) => {
   return (
     <Card className="w-full">
@@ -59,18 +61,19 @@ export const EventCard = ({
           </p>
         </div>
       </CardContent>
-      <CardFooter className="space-x-2">
-        {isAdmin ? (
-          <>
-            <Button variant="outline" onClick={onEdit}>
-              Edit
-            </Button>
+      <CardFooter className="flex justify-between">
+        {!isAdmin && (
+          <Button onClick={() => onRegister(event.id)} disabled={isRegistered}>
+            {isRegistered ? 'Registered' : 'Register'}
+          </Button>
+        )}
+        {isAdmin && (
+          <div className="flex gap-2">
+            <Button onClick={onEdit}>Edit</Button>
             <Button variant="destructive" onClick={onDelete}>
               Delete
             </Button>
-          </>
-        ) : (
-          <Button onClick={onRegister}>Register</Button>
+          </div>
         )}
       </CardFooter>
     </Card>
