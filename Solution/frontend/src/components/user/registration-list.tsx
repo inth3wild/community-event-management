@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -8,15 +9,23 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useEventStore } from '@/stores/event.store';
 import { format } from 'date-fns';
+import { ArrowLeft } from 'lucide-react';
 
 export const RegistrationList = () => {
-  const { fetchRegisteredEvents, registrations } = useEventStore();
+  const navigate = useNavigate();
+  const { fetchRegisteredEvents, registrations, clearRegistrations } =
+    useEventStore();
 
   useEffect(() => {
     fetchRegisteredEvents();
-  }, [fetchRegisteredEvents]);
+
+    return () => {
+      clearRegistrations();
+    };
+  }, [fetchRegisteredEvents, clearRegistrations]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -32,39 +41,53 @@ export const RegistrationList = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">My Registrations</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Event</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Venue</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {registrations.map((registration) => (
-            <TableRow key={registration.id}>
-              <TableCell>{registration.event.name}</TableCell>
-              <TableCell>
-                {format(new Date(registration.event.startTime), 'PPP')}
-              </TableCell>
-              <TableCell>
-                {registration.event.venues.map((v) => v.name).join(', ')}
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant="outline"
-                  className={getStatusColor(registration.status)}
-                >
-                  {registration.status}
-                </Badge>
-              </TableCell>
+    <div className="space-y-6 p-6">
+      <div className="flex items-center space-x-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Events
+        </Button>
+        <h2 className="text-2xl font-bold">My Registrations</h2>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Event</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Venue</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {registrations.map((registration) => (
+              <TableRow key={registration.id}>
+                <TableCell>{registration.event.name}</TableCell>
+                <TableCell>
+                  {format(new Date(registration.event.startTime), 'PPP')}
+                </TableCell>
+                <TableCell>
+                  {registration.event.venues.map((v) => v.name).join(', ')}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={getStatusColor(registration.status)}
+                  >
+                    {registration.status}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

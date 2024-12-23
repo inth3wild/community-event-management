@@ -11,13 +11,14 @@ interface EventState {
   activities: Activity[];
   loading: boolean;
   error: string | null;
+  registeredEvents: string[]; // Array of event IDs the user is registered for
+  registrations: Registration[];
   fetchEvents: (userRole: string) => Promise<void>;
   fetchVenues: () => Promise<void>;
   fetchActivities: () => Promise<void>;
   createEvent: (formDataToSend: FormData) => Promise<void>;
   updateEvent: (id: string, formDataToSend: FormData) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
-  registeredEvents: string[]; // Array of event IDs the user is registered for
   registerForEvent: (
     eventId: string,
     participantData: {
@@ -27,7 +28,7 @@ interface EventState {
     }
   ) => Promise<void>;
   fetchRegisteredEvents: () => Promise<void>;
-  registrations: Registration[];
+  clearRegistrations: () => void;
 }
 
 export const useEventStore = create<EventState>((set, get) => ({
@@ -153,4 +154,5 @@ export const useEventStore = create<EventState>((set, get) => ({
       set({ loading: false });
     }
   },
+  clearRegistrations: () => set({ registrations: [] }),
 }));
