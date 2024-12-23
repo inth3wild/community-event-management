@@ -95,35 +95,6 @@ class UserEventsController {
   }
 
   // Get user's registrations
-  // async viewRegistrations(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const participantId = req.params.participantId;
-
-  //     const registrations = await prisma.registration.findMany({
-  //       where: { participantId },
-  //       include: {
-  //         event: {
-  //           include: {
-  //             venues: true,
-  //             activities: true,
-  //           },
-  //         },
-  //         participant: true,
-  //       },
-  //       orderBy: {
-  //         registeredAt: 'desc',
-  //       },
-  //     });
-
-  //     res.status(200).json({
-  //       status: 'okay',
-  //       message: 'Registrations retrieved successfully',
-  //       data: registrations,
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
   async viewRegistrations(req: Request, res: Response, next: NextFunction) {
     try {
       const { email } = req.body;
