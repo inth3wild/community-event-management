@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VenueManagement } from '@/components/admin/venue-management';
 import { ActivityManagement } from '@/components/admin/activity-management';
 import { RegistrationManagement } from '@/components/admin/registration-management';
-import { EventForm } from '@/components/admin/event-form';
+import { EventManagement } from '@/components/admin/event-management';
 import { Layout } from '@/components/layout/layout';
 
 export const AdminDashboardPage = () => {
@@ -19,7 +19,7 @@ export const AdminDashboardPage = () => {
           </TabsList>
 
           <TabsContent value="events">
-            <EventForm onSuccess={() => {}} />
+            <EventManagement />
           </TabsContent>
 
           <TabsContent value="venues">

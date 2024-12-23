@@ -11,8 +11,8 @@ interface EventState {
   fetchEvents: (userRole: string) => Promise<void>;
   fetchVenues: () => Promise<void>;
   fetchActivities: () => Promise<void>;
-  createEvent: (formData: FormData) => Promise<void>;
-  updateEvent: (id: string, eventData: Partial<Event>) => Promise<void>;
+  createEvent: (formDataToSend: FormData) => Promise<void>;
+  updateEvent: (id: string, formDataToSend: FormData) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
 }
 
@@ -74,8 +74,16 @@ export const useEventStore = create<EventState>((set, get) => ({
     set({ events: [...get().events, response.data] });
   },
 
-  updateEvent: async (id, eventData) => {
-    const response = await api.patch(`/admin/events/update/${id}`, eventData);
+  updateEvent: async (id, formDataToSend) => {
+    const response = await api.patch(
+      `/admin/events/update/${id}`,
+      formDataToSend,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     set({
       events: get().events.map((event) =>
         event.id === id ? { ...event, ...response.data } : event

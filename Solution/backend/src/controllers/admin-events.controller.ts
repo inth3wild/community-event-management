@@ -170,38 +170,62 @@ class AdminEventsController {
 
   // Update an event
   async updateEvent(req: Request, res: Response, next: NextFunction) {
+    let uploadedImage: any = null;
+
     try {
       const { eventId } = req.params;
-      const validatedData = updateEventSchema.parse(req.body);
+
+      // Parse and preprocess form fields
+      const {
+        venueIds: venuesStringArray,
+        activityIds: activitiesStringArray,
+        startTime,
+        endTime,
+        name,
+        description,
+      } = req.body;
+
+      const normalizedData = {
+        name,
+        description,
+        startTime,
+        endTime,
+        venueIds: JSON.parse(venuesStringArray), // Convert string to array
+        activityIds: JSON.parse(activitiesStringArray), // Convert string to array
+      };
+      // Validate input
+      const validatedData = updateEventSchema.parse(normalizedData);
+
+      // Check if end time is after start time
+      if (
+        new Date(validatedData.endTime as string) <=
+        new Date(validatedData.startTime as string)
+      ) {
+        throw new AppError('End time must be after start time', 400);
+      }
+
+      // Destructure the IDs arrays from other event data
       const { venueIds, activityIds, ...eventData } = validatedData;
 
-      // Check if event exists
-      const existingEvent = await prisma.event.findUnique({
-        where: { id: eventId },
+      // Verify venues exist
+      const venues = await prisma.venue.findMany({
+        where: { id: { in: venueIds } },
       });
-
-      if (!existingEvent) {
-        throw new AppError('Event not found', 404);
+      if (venues.length !== venueIds?.length) {
+        throw new AppError('One or more venue IDs are invalid', 400);
       }
 
-      // Verify venues if provided
-      if (venueIds) {
-        const venues = await prisma.venue.findMany({
-          where: { id: { in: venueIds } },
-        });
-        if (venues.length !== venueIds.length) {
-          throw new AppError('One or more venue IDs are invalid', 400);
-        }
+      // Verify activities exist
+      const activities = await prisma.activity.findMany({
+        where: { id: { in: activityIds } },
+      });
+      if (activities.length !== activityIds?.length) {
+        throw new AppError('One or more activity IDs are invalid', 400);
       }
 
-      // Verify activities if provided
-      if (activityIds) {
-        const activities = await prisma.activity.findMany({
-          where: { id: { in: activityIds } },
-        });
-        if (activities.length !== activityIds.length) {
-          throw new AppError('One or more activity IDs are invalid', 400);
-        }
+      // Handle image upload if present
+      if (req.file) {
+        uploadedImage = await uploadEventImage(req.file);
       }
 
       // Update event
@@ -209,6 +233,12 @@ class AdminEventsController {
         where: { id: eventId },
         data: {
           ...eventData,
+          ...(uploadedImage !== undefined && {
+            imageUrl: uploadedImage?.secure_url,
+          }),
+          ...(uploadedImage !== undefined && {
+            imageId: uploadedImage?.public_id,
+          }),
           ...(venueIds && {
             venues: {
               set: venueIds.map((id) => ({ id })),

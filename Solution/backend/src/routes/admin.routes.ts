@@ -21,7 +21,11 @@ adminRouter.post(
 );
 
 // Update event route
-adminRouter.patch('/update/:eventId', adminEventsController.updateEvent);
+adminRouter.patch(
+  '/update/:eventId',
+  eventImageUpload,
+  adminEventsController.updateEvent
+);
 
 // Delete event route
 adminRouter.delete('/delete/:eventId', adminEventsController.deleteEvent);

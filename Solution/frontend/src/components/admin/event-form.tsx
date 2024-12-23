@@ -31,6 +31,7 @@ export const EventForm = ({ event, onSuccess }: EventFormProps) => {
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [shouldRemoveImage, setShouldRemoveImage] = useState(false);
   const [venues, setVenues] = useState<Venue[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const { createEvent, updateEvent } = useEventStore();
@@ -52,10 +53,8 @@ export const EventForm = ({ event, onSuccess }: EventFormProps) => {
     e.preventDefault();
 
     try {
-      // Create FormData instance
       const formDataToSend = new FormData();
 
-      // Prepare the arrays as JSON strings
       const venueIds = Array.isArray(formData.venueIds)
         ? formData.venueIds
         : [formData.venueIds];
@@ -63,40 +62,27 @@ export const EventForm = ({ event, onSuccess }: EventFormProps) => {
         ? formData.activityIds
         : [formData.activityIds];
 
-      // Convert datetime strings to ISO format
       const startTimeISO = new Date(formData.startTime).toISOString();
       const endTimeISO = new Date(formData.endTime).toISOString();
 
-      // Append basic fields
       formDataToSend.append('name', formData.name);
       formDataToSend.append('description', formData.description || '');
       formDataToSend.append('startTime', startTimeISO);
       formDataToSend.append('endTime', endTimeISO);
-
-      // Append arrays as JSON strings
       formDataToSend.append('venueIds', JSON.stringify(venueIds));
       formDataToSend.append('activityIds', JSON.stringify(activityIds));
 
-      // Append image if exists
+      // Only handle image if there's a change
       if (imageFile) {
         formDataToSend.append('eventImage', imageFile);
+      } else if (shouldRemoveImage) {
+        formDataToSend.append('eventImage', 'null');
       }
 
       if (event) {
-        // Update existing event
-        const response = await api.patch(
-          `/admin/events/update/${event.id}`,
-          formDataToSend,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-        await updateEvent(event.id, response.data);
+        await updateEvent(event.id, formDataToSend);
         toast({ title: 'Success', description: 'Event updated successfully' });
       } else {
-        // Create new event
         await createEvent(formDataToSend);
         toast({ title: 'Success', description: 'Event created successfully' });
       }
@@ -119,10 +105,14 @@ export const EventForm = ({ event, onSuccess }: EventFormProps) => {
         <FileInput
           onFileSelect={setImageFile}
           previewUrl={event?.imageUrl}
-          onClear={() => setImageFile(null)}
+          onClear={() => {
+            setImageFile(null);
+            setShouldRemoveImage(true);
+          }}
         />
       </div>
 
+      {/* Rest of the form remains unchanged */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Name</label>
         <Input
