@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/app.ts",
     "test": "vitest",
-    "build": "tsc -b",
+    "build": "npm i && npx prisma generate && npm run migrate:deploy && tsc -b",
+    "start": "node dist/app.js",
     "seed": "prisma db seed",
     "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
     "test:ui": "vitest --ui"
   },
   "prisma": {
