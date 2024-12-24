@@ -12,7 +12,7 @@ interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
-  ({ className, onFileSelect, previewUrl, onClear, ...props }, ref) => {
+  ({ className, onFileSelect, previewUrl, onClear, ...props }, _ref) => {
     const [preview, setPreview] = React.useState<string | undefined>(
       previewUrl
     );
