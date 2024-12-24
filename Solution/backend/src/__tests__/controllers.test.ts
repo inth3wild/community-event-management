@@ -187,8 +187,16 @@ describe('AuthController', () => {
       mockRequest.body = mockCredentials;
 
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-      vi.mocked(bcrypt.compare).mockResolvedValue(true);
-      vi.mocked(jwt.sign).mockReturnValue('mockToken');
+      vi.mocked<(password: string, hash: string) => Promise<boolean>>(
+        bcrypt.compare
+      ).mockResolvedValue(true);
+      vi.mocked<
+        (
+          payload: string | object | Buffer,
+          secretOrPrivateKey: jwt.Secret,
+          options?: jwt.SignOptions
+        ) => string
+      >(jwt.sign).mockReturnValue('mockToken');
 
       await AuthController.login(
         mockRequest as Request,
