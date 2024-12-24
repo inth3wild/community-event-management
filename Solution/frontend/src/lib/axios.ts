@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const baseURL =
-  process.env.NODE_ENVIRONMENT === 'dev'
-    ? 'http://localhost:3000/api'
-    : 'https://community-event-management-backend.onrender.com/api';
+  import.meta.env.VITE_NODE_ENVIRONMENT === 'prod'
+    ? 'https://community-event-management-backend.onrender.com/api'
+    : 'http://localhost:3000/api';
 
 const api = axios.create({
   baseURL,
