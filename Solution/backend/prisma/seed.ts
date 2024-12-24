@@ -18,6 +18,20 @@ async function main() {
     },
   });
 
+  // Create normal user
+  const normalUserPassword = await bcrypt.hash('123456', 10);
+  const normalUser = await prisma.user.upsert({
+    where: { email: 'user@example.com' },
+    update: {},
+    create: {
+      name: 'User',
+      email: 'user@example.com',
+      phoneNumber: '111111',
+      password: normalUserPassword,
+      role: 'USER',
+    },
+  });
+
   // Create initial venue
   const venue = await prisma.venue.create({
     data: {
@@ -35,7 +49,7 @@ async function main() {
     },
   });
 
-  console.log({ admin });
+  console.log({ admin, normalUser });
 }
 
 main()
