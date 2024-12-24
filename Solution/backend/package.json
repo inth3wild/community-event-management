@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/app.ts",
     "test": "vitest",
-    "build": "npm i && npx prisma generate && npm run migrate:deploy && tsc -b",
+    "build": "npm i && npx prisma generate && npm run migrate:deploy && npm run seed && tsc -b",
     "start": "node dist/app.js",
     "seed": "prisma db seed",
     "migrate": "prisma migrate dev",
