@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import { environment } from './config/app.config';
 
 // Import route modules
-import activityRouter from './routes/activity.routes';
+import activityRouter from '@/routes/activity.routes';
 import adminRouter from './routes/admin.routes';
 import authRouter from './routes/auth.routes';
 import registrationRouter from './routes/registration.routes';

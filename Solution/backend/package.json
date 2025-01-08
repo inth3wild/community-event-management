@@ -4,9 +4,9 @@
   "description": "Backend for Community Event Management System",
   "main": "app.ts",
   "scripts": {
-    "dev": "ts-node-dev --respawn --pretty --transpile-only src/app.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --pretty --transpile-only src/app.ts",
     "test": "vitest",
-    "build": "npm i && npx prisma generate && npm run migrate:deploy && npm run seed && tsc -b",
+    "build": "npm i && npx prisma generate && npm run migrate:deploy && npm run seed && tsc -b && tsc-alias",
     "start": "node dist/app.js",
     "seed": "prisma db seed",
     "migrate": "prisma migrate dev",
@@ -43,6 +43,8 @@
     "prisma": "^6.1.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   }
