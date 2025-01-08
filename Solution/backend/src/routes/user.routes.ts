@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import adminEventsController from '../controllers/admin-events.controller';
-import userEventsController from '../controllers/user-events.controller';
+import adminEventsController from '@/controllers/admin-events.controller';
+import userEventsController from '@/controllers/user-events.controller';
 
 const userRouter = Router();
 

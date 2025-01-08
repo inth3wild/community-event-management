@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import prisma from '../config/database.config';
-import { updateRegistrationStatusSchema } from '../validators/event.validator';
+import prisma from '@/config/database.config';
+import { updateRegistrationStatusSchema } from '@/validators/event.validator';
 
 class RegistrationController {
   // Manage registration status

@@ -1,9 +1,9 @@
 import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { environment } from '../config/app.config';
-import prisma from '../config/database.config';
-import { AppError } from '../middlewares/error.middleware';
-import { RequestWithUser } from '../types/index';
+import { environment } from '@/config/app.config';
+import prisma from '@/config/database.config';
+import { AppError } from '@/middlewares/error.middleware';
+import { RequestWithUser } from '@/types/index';
 
 export const authenticateToken = async (
   req: RequestWithUser,

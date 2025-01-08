@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import prisma from '../config/database.config';
-import { activitySchema } from '../validators/event.validator';
+import prisma from '@/config/database.config';
+import { activitySchema } from '@/validators/event.validator';
 
 class ActivityController {
   // Activity Management

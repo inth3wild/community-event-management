@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import adminEventsController from '../controllers/admin-events.controller';
-import { eventImageUpload } from '../middlewares/multer.middleware';
+import adminEventsController from '@/controllers/admin-events.controller';
+import { eventImageUpload } from '@/middlewares/multer.middleware';
 
 const adminRouter = Router();
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import multer from 'multer';
-import { AppError } from '../middlewares/error.middleware';
+import { AppError } from '@/middlewares/error.middleware';
 
 const storage = multer.memoryStorage();
 

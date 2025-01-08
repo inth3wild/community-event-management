@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { environment } from '../config/app.config';
-import prisma from '../config/database.config';
-import { AppError } from '../middlewares/error.middleware';
-import { LoginSchema, RegisterSchema } from '../validators/auth.validator';
+import { environment } from '@/config/app.config';
+import prisma from '@/config/database.config';
+import { AppError } from '@/middlewares/error.middleware';
+import { LoginSchema, RegisterSchema } from '@/validators/auth.validator';
 
 class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {

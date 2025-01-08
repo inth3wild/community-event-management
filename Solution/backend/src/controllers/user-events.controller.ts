@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import prisma from '../config/database.config';
-import { AppError } from '../middlewares/error.middleware';
-import { registrationSchema } from '../validators/event.validator';
+import prisma from '@/config/database.config';
+import { AppError } from '@/middlewares/error.middleware';
+import { registrationSchema } from '@/validators/event.validator';
 
 class UserEventsController {
   // Register for an event

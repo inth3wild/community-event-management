@@ -2,12 +2,12 @@ import * as bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import prisma from '../config/database.config';
-import ActivityController from '../controllers/activity.controller';
-import AuthController from '../controllers/auth.controller';
-import RegistrationController from '../controllers/registration.controller';
-import UserEventsController from '../controllers/user-events.controller';
-import VenueController from '../controllers/venue.controller';
+import prisma from '@/config/database.config';
+import ActivityController from '@/controllers/activity.controller';
+import AuthController from '@/controllers/auth.controller';
+import RegistrationController from '@/controllers/registration.controller';
+import UserEventsController from '@/controllers/user-events.controller';
+import VenueController from '@/controllers/venue.controller';
 
 // Fix mock implementations
 vi.mock('bcrypt', async () => ({
@@ -23,7 +23,7 @@ vi.mock('jsonwebtoken', () => ({
 }));
 
 // Mock cloudinary utils
-vi.mock('../utils/cloudinary.utils', () => ({
+vi.mock('@/utils/cloudinary.utils', () => ({
   uploadEventImage: vi.fn(),
   deleteEventImage: vi.fn(),
 }));
@@ -36,7 +36,7 @@ vi.mock('../utils/cloudinary.utils', () => ({
 // };
 
 // Mock Prisma
-vi.mock('../config/database.config', () => ({
+vi.mock('@/config/database.config', () => ({
   default: {
     event: {
       create: vi.fn(),

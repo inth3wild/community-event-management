@@ -1,11 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import prisma from '../config/database.config';
-import { AppError } from '../middlewares/error.middleware';
-import { deleteEventImage, uploadEventImage } from '../utils/cloudinary.utils';
-import {
-  createEventSchema,
-  updateEventSchema,
-} from '../validators/event.validator';
+import prisma from '@/config/database.config';
+import { AppError } from '@/middlewares/error.middleware';
+import { deleteEventImage, uploadEventImage } from '@/utils/cloudinary.utils';
+import { createEventSchema, updateEventSchema } from '@/validators/event.validator';
 
 class AdminEventsController {
   // Create a new event
