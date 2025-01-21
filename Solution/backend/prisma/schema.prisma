@@ -66,11 +66,14 @@ model Venue {
     // Additional metadata
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    @@unique([name, address])
+    @@index([name])
 }
 
 model Activity {
     id          String  @id @default(uuid())
-    name        String
+    name        String  @unique
     description String?
 
     // Relationships

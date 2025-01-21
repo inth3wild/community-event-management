@@ -11,7 +11,8 @@
     "seed": "prisma db seed",
     "migrate": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "prisma:studio": "prisma studio"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

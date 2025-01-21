@@ -33,8 +33,15 @@ async function main() {
   });
 
   // Create initial venue
-  const venue = await prisma.venue.create({
-    data: {
+  const venue = await prisma.venue.upsert({
+    where: {
+      name_address: {
+        name: 'Main Conference Hall',
+        address: '123 Tech Street',
+      },
+    },
+    update: {},
+    create: {
       name: 'Main Conference Hall',
       address: '123 Tech Street',
       capacity: 5,
@@ -42,8 +49,12 @@ async function main() {
   });
 
   // Create initial activity
-  const activity = await prisma.activity.create({
-    data: {
+  const activity = await prisma.activity.upsert({
+    where: {
+      name: 'Keynote Speech',
+    },
+    update: {},
+    create: {
       name: 'Keynote Speech',
       description: 'Opening keynote about future tech trends',
     },
